@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Environment and logs
+*.log
+npm-debug.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Development notes / scratch
+scratch/

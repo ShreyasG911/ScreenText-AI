@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScreenText AI</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <img src="icons/icon48.png" alt="ScreenText AI Logo" class="brand-logo">
+        <div class="brand-text">
+          <div class="brand-title-row">
+            <h1 class="brand-title">ScreenText AI</h1>
+            <span class="version-badge">v1.0.0</span>
+          </div>
+          <p class="brand-tagline">Turn screen content into editable text</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Action Buttons -->
+    <main class="main-content">
+      <div class="action-grid">
+        <button id="btnSelectArea" class="action-btn btn-primary" title="Click and drag to select any region on the screen">
+          <div class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 7V4h3"></path>
+              <path d="M20 7V4h-3"></path>
+              <path d="M4 17v3h3"></path>
+              <path d="M20 17v3h-3"></path>
+              <rect x="8" y="8" width="8" height="8" rx="1"></rect>
+            </svg>
+          </div>
+          <div class="btn-content">
+            <span class="btn-label">Select Area</span>
+            <span class="btn-sub">Drag rectangle over text</span>
+          </div>
+        </button>
+
+        <button id="btnCaptureTab" class="action-btn btn-secondary" title="Capture the entire visible tab viewport">
+          <div class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </div>
+          <div class="btn-content">
+            <span class="btn-label">Capture Entire Tab</span>
+            <span class="btn-sub">Extract all visible text</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Live Status Banner -->
+      <div id="statusBanner" class="status-banner status-idle">
+        <span class="status-indicator"></span>
+        <span id="statusText" class="status-text">Ready to capture</span>
+      </div>
+
+      <!-- Quick Preview & Results Area (Collapsed when empty, expands on result) -->
+      <section id="resultsSection" class="results-section hidden">
+        <div class="results-header">
+          <div class="results-meta">
+            <span class="results-title">Extracted Text</span>
+            <span id="charCountBadge" class="meta-badge">0 chars</span>
+          </div>
+          <button id="btnOpenFull" class="text-link-btn" title="Open in persistent editor">
+            Open in Full Tab ↗
+          </button>
+        </div>
+
+        <div class="editor-wrapper">
+          <textarea id="resultEditor" class="result-textarea" spellcheck="false" placeholder="Extracted text will appear here..."></textarea>
+        </div>
+
+        <div class="results-toolbar">
+          <button id="btnCopy" class="tool-btn btn-copy" title="Copy text to clipboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span id="copyBtnLabel">Copy</span>
+          </button>
+
+          <button id="btnSelectAll" class="tool-btn" title="Select all text">
+            Select All
+          </button>
+
+          <button id="btnDownload" class="tool-btn" title="Download text as .txt file">
+            Download
+          </button>
+
+          <button id="btnClear" class="tool-btn btn-danger-ghost" title="Clear text">
+            Clear
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="privacy-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shield-icon">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        <span>100% on-device OCR • No data leaves your browser</span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="popup.js" type="module"></script>
+</body>
+</html>

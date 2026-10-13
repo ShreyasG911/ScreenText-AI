@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScreenText AI — OCR Results & Editor</title>
+  <link rel="stylesheet" href="results.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Navigation / Header Bar -->
+    <header class="app-header">
+      <div class="brand">
+        <img src="icons/icon48.png" alt="ScreenText AI" class="brand-logo">
+        <div>
+          <h1 class="brand-name">ScreenText AI</h1>
+          <p class="brand-sub">Screen-to-Text OCR Editor</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="btnNewSelectArea" class="hdr-btn hdr-btn-primary" title="Select a new screen area">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 7V4h3"></path>
+            <path d="M20 7V4h-3"></path>
+            <path d="M4 17v3h3"></path>
+            <path d="M20 17v3h-3"></path>
+            <rect x="8" y="8" width="8" height="8" rx="1"></rect>
+          </svg>
+          <span>Select Area</span>
+        </button>
+
+        <button id="btnNewCaptureTab" class="hdr-btn hdr-btn-secondary" title="Capture entire active tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+          <span>Capture Tab</span>
+        </button>
+
+        <button id="btnThemeToggle" class="hdr-btn hdr-btn-icon" title="Toggle Light / Dark Mode" aria-label="Toggle theme">
+          <svg id="themeIconSun" class="theme-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg id="themeIconMoon" class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace: Split Pane (Image Preview + Text Editor) -->
+    <main class="workspace">
+      <!-- Left Panel: Captured Screenshot Preview -->
+      <section class="panel preview-panel">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <h2 class="panel-title">Captured Image</h2>
+            <span id="imgDimensionsBadge" class="badge">0 × 0 px</span>
+          </div>
+          <div class="panel-controls">
+            <button id="btnZoomToggle" class="sub-tool-btn" title="Toggle Zoom: Fit / 100% / 200%">
+              <span id="zoomLabel">Zoom: Fit</span>
+            </button>
+            <span id="captureModeBadge" class="badge mode-badge">Region</span>
+          </div>
+        </div>
+
+        <div class="preview-container" id="previewContainer">
+          <div id="imagePlaceholder" class="placeholder-view">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="placeholder-icon">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            <p>No screenshot captured yet</p>
+            <span class="placeholder-sub">Click "Select Area" or "Capture Tab" to begin</span>
+          </div>
+          <img id="capturedImagePreview" class="preview-img hidden zoom-fit" alt="Captured screenshot preview">
+        </div>
+      </section>
+
+      <!-- Right Panel: OCR Text Editor -->
+      <section class="panel editor-panel">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <h2 class="panel-title">Extracted Text</h2>
+            <span id="editorStatsBadge" class="badge">0 chars • 0 words • 0 lines</span>
+          </div>
+          <div class="panel-controls">
+            <button id="btnFontToggle" class="sub-tool-btn" title="Toggle Monospace / Sans font">
+              <span id="fontToggleLabel">Monospace</span>
+            </button>
+            <div id="ocrStatusBadge" class="status-pill status-ready">
+              <span class="status-dot"></span>
+              <span id="ocrStatusText">Ready</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- OCR Progress Bar -->
+        <div id="ocrProgressContainer" class="progress-bar-container hidden">
+          <div id="ocrProgressBar" class="progress-bar-fill" style="width: 0%;"></div>
+        </div>
+
+        <!-- Textarea Editor -->
+        <div class="editor-container">
+          <textarea id="mainEditor" class="main-textarea font-mono" spellcheck="false" placeholder="Recognized text will appear here. You can edit, format, or type directly into this box..."></textarea>
+        </div>
+
+        <!-- Action Toolbar -->
+        <div class="editor-actions">
+          <div class="primary-actions">
+            <button id="btnCopyResult" class="btn btn-copy" title="Copy text to clipboard">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span id="copyBtnText">Copy Text</span>
+            </button>
+
+            <button id="btnSelectAllResult" class="btn btn-secondary-action" title="Select all text in editor (Ctrl+A)">
+              Select All
+            </button>
+
+            <button id="btnDownloadResult" class="btn btn-secondary-action" title="Download text as a .txt file">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Download TXT</span>
+            </button>
+
+            <button id="btnMergeLines" class="btn btn-secondary-action" title="Join broken line breaks into smooth paragraphs">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="21" y1="6" x2="3" y2="6"></line>
+                <line x1="15" y1="12" x2="3" y2="12"></line>
+                <line x1="17" y1="18" x2="3" y2="18"></line>
+              </svg>
+              <span>Merge Lines</span>
+            </button>
+
+            <button id="btnRerunOCR" class="btn btn-secondary-action" title="Re-run text recognition on this image">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+              </svg>
+              <span>Re-run OCR</span>
+            </button>
+          </div>
+
+          <div class="danger-actions">
+            <button id="btnClearResult" class="btn btn-danger" title="Clear text from editor">
+              Clear
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-privacy">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shield-icon">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        <span>100% on-device OCR • No images or text ever leave your computer.</span>
+      </div>
+      <div class="footer-shortcuts">
+        <span>Tip: Press <kbd>Esc</kbd> on any webpage to cancel area selection</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastNotification" class="toast hidden">
+    <span id="toastMessage">Copied to clipboard</span>
+  </div>
+
+  <canvas id="cropCanvas" style="display:none;"></canvas>
+  <script src="lib/tesseract.min.js"></script>
+  <script src="results.js" type="module"></script>
+</body>
+</html>
